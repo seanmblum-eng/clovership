@@ -2,8 +2,17 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
+// Clover webhook verification
+router.get('/easypost', (req, res) => {
+  const verificationCode = req.query.verification_code;
+  if (verificationCode) {
+    res.send(verificationCode);
+  } else {
+    res.json({ status: 'webhook endpoint active' });
+  }
+});
+
 // EasyPost delivery webhook
-// Fires when a package status changes (in_transit, delivered, etc.)
 router.post('/easypost', async (req, res) => {
   const event = req.body;
 
@@ -14,7 +23,6 @@ router.post('/easypost', async (req, res) => {
 
     console.log(`Tracking event: ${trackingCode} — ${status}`);
 
-    // When package is delivered, trigger ReviewBoost
     if (status === 'delivered') {
       const merchantId = result?.metadata?.merchant_id;
       const customerId = result?.metadata?.customer_id;
@@ -22,7 +30,6 @@ router.post('/easypost', async (req, res) => {
 
       console.log(`Package delivered — Order ${orderId}, Customer ${customerId}`);
 
-      // Fire ReviewBoost loyalty reward
       if (merchantId && customerId) {
         await triggerReviewBoost(merchantId, customerId, orderId);
       }
@@ -36,25 +43,20 @@ router.post('/easypost', async (req, res) => {
   }
 });
 
-// Send delivery event to ReviewBoost
 async function triggerReviewBoost(merchantId, customerId, orderId) {
   try {
     const reviewBoostUrl = process.env.REVIEWBOOST_URL;
-
     if (!reviewBoostUrl) {
       console.log('REVIEWBOOST_URL not set — skipping loyalty trigger');
       return;
     }
-
     await axios.post(`${reviewBoostUrl}/api/delivery-event`, {
       merchant_id: merchantId,
       customer_id: customerId,
       order_id: orderId,
       event: 'delivered'
     });
-
     console.log(`ReviewBoost triggered for customer ${customerId}`);
-
   } catch (err) {
     console.error('ReviewBoost trigger error:', err.message);
   }
