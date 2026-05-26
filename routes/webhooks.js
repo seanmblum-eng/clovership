@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
-// Clover webhook verification
+// Clover webhook verification - GET
 router.get('/easypost', (req, res) => {
   const verificationCode = req.query.verification_code;
   if (verificationCode) {
@@ -12,12 +12,22 @@ router.get('/easypost', (req, res) => {
   }
 });
 
-// EasyPost delivery webhook
+// Clover webhook verification - POST
 router.post('/easypost', async (req, res) => {
-  const event = req.body;
+  const body = req.body;
 
+  // Log everything so we can see the verification code
+  console.log('Webhook received:', JSON.stringify(body));
+
+  // Handle Clover verification code
+  if (body.verificationCode) {
+    console.log('VERIFICATION CODE:', body.verificationCode);
+    return res.status(200).send(body.verificationCode);
+  }
+
+  // EasyPost delivery webhook
   try {
-    const result = event.result;
+    const result = body.result;
     const status = result?.status;
     const trackingCode = result?.tracking_code;
 
@@ -27,8 +37,6 @@ router.post('/easypost', async (req, res) => {
       const merchantId = result?.metadata?.merchant_id;
       const customerId = result?.metadata?.customer_id;
       const orderId = result?.metadata?.order_id;
-
-      console.log(`Package delivered — Order ${orderId}, Customer ${customerId}`);
 
       if (merchantId && customerId) {
         await triggerReviewBoost(merchantId, customerId, orderId);
