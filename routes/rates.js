@@ -1,24 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const EasyPost = require('@easypost/api');
+const EasyPostClient = require('@easypost/api');
 
-// Get live shipping rates for an order
 router.post('/', async (req, res) => {
   const {
-    to_name,
-    to_street1,
-    to_city,
-    to_state,
-    to_zip,
-    to_country,
-    weight_oz,
-    length,
-    width,
-    height
+    to_name, to_street1, to_city, to_state,
+    to_zip, to_country, weight_oz, length, width, height
   } = req.body;
 
   try {
-    const client = new EasyPost(process.env.EASYPOST_API_KEY);
+    const client = new EasyPostClient(process.env.EASYPOST_API_KEY);
 
     const shipment = await client.Shipment.create({
       from_address: {
@@ -38,15 +29,14 @@ router.post('/', async (req, res) => {
         country: to_country || 'US'
       },
       parcel: {
-        length,
-        width,
-        height,
-        weight: weight_oz
+        length: length || 10,
+        width: width || 8,
+        height: height || 6,
+        weight: weight_oz || 16
       }
     });
 
-    // Return rates sorted cheapest first
-    const rates = shipment.rates.sort((a, b) => 
+    const rates = (shipment.rates || []).sort((a, b) =>
       parseFloat(a.rate) - parseFloat(b.rate)
     );
 
@@ -64,7 +54,7 @@ router.post('/', async (req, res) => {
 
   } catch (err) {
     console.error('Rates error:', err.message);
-    res.status(500).json({ error: 'Could not fetch rates' });
+    res.status(500).json({ error: 'Could not fetch rates', detail: err.message });
   }
 });
 
