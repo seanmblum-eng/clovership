@@ -36,13 +36,27 @@ router.post('/', async (req, res) => {
       }
     });
 
-    const rates = (shipment.rates || []).sort((a, b) =>
-      parseFloat(a.rate) - parseFloat(b.rate)
-    );
+    // Log full shipment object so we can see the structure
+    console.log('Shipment keys:', Object.keys(shipment));
+    console.log('Shipment rates:', JSON.stringify(shipment.rates));
+    console.log('Shipment lowestRate:', shipment.lowestRate);
+
+    // Try multiple ways to get rates
+    const rates = shipment.rates
+      || shipment.lowestRate
+      || [];
+
+    const ratesArray = Array.isArray(rates) ? rates : [rates];
+
+    const sorted = ratesArray
+      .filter(r => r && r.rate)
+      .sort((a, b) => parseFloat(a.rate) - parseFloat(b.rate));
+
+    console.log('Sorted rates count:', sorted.length);
 
     res.json({
       shipment_id: shipment.id,
-      rates: rates.map(r => ({
+      rates: sorted.map(r => ({
         id: r.id,
         carrier: r.carrier,
         service: r.service,
@@ -53,7 +67,7 @@ router.post('/', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Rates error:', err.message);
+    console.error('Rates error full:', err);
     res.status(500).json({ error: 'Could not fetch rates', detail: err.message });
   }
 });
