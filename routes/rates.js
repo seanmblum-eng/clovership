@@ -36,23 +36,19 @@ router.post('/', async (req, res) => {
       }
     });
 
-    // Log full shipment object so we can see the structure
-    console.log('Shipment keys:', Object.keys(shipment));
-    console.log('Shipment rates:', JSON.stringify(shipment.rates));
-    console.log('Shipment lowestRate:', shipment.lowestRate);
+    console.log('Validation errors:', JSON.stringify(shipment._validationErrors));
+    console.log('From address:', JSON.stringify(shipment.from_address));
+    console.log('To address:', JSON.stringify(shipment.to_address));
 
-    // Try multiple ways to get rates
-    const rates = shipment.rates
-      || shipment.lowestRate
-      || [];
+    // Need to call buy with no rate to just get rates
+    const bought = await client.Shipment.get(shipment.id);
+    console.log('Bought keys:', Object.keys(bought));
+    console.log('Bought rates:', JSON.stringify(bought.rates));
 
-    const ratesArray = Array.isArray(rates) ? rates : [rates];
-
-    const sorted = ratesArray
+    const rates = bought.rates || [];
+    const sorted = rates
       .filter(r => r && r.rate)
       .sort((a, b) => parseFloat(a.rate) - parseFloat(b.rate));
-
-    console.log('Sorted rates count:', sorted.length);
 
     res.json({
       shipment_id: shipment.id,
@@ -67,7 +63,7 @@ router.post('/', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Rates error full:', err);
+    console.error('Rates error full:', err.message);
     res.status(500).json({ error: 'Could not fetch rates', detail: err.message });
   }
 });
