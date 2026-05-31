@@ -31,4 +31,34 @@ router.post('/', async (req, res) => {
       parcel: {
         length: length || 10,
         width: width || 8,
-        heigh
+        height: height || 6,
+        weight: weight_oz || 16
+      }
+    });
+
+    console.log('Shipment id:', shipment.id);
+    console.log('Rates:', JSON.stringify(shipment.rates));
+
+    const rates = (shipment.rates || [])
+      .filter(r => r && r.rate)
+      .sort((a, b) => parseFloat(a.rate) - parseFloat(b.rate));
+
+    res.json({
+      shipment_id: shipment.id,
+      rates: rates.map(r => ({
+        id: r.id,
+        carrier: r.carrier,
+        service: r.service,
+        rate: r.rate,
+        delivery_days: r.delivery_days,
+        delivery_date: r.delivery_date
+      }))
+    });
+
+  } catch (err) {
+    console.error('Rates error:', err.message);
+    res.status(500).json({ error: 'Could not fetch rates', detail: err.message });
+  }
+});
+
+module.exports = router;
