@@ -23,6 +23,17 @@ const serviceName = (s) => s
   .replace('3DaySelect', '3 Day Select')
   .replace(/_/g, ' ');
 
+// Only show these clean service levels
+const ALLOWED_SERVICES = [
+  'GroundsaverGreaterThan1lb', 'UPSGroundsaverGreaterThan1lb',
+  'Ground', 'GroundAdvantage',
+  'Priority', 'FEDEX_GROUND',
+  '3DaySelect', 'FEDEX_EXPRESS_SAVER',
+  '2ndDayAir', 'FEDEX_2_DAY',
+  'NextDayAir', 'PRIORITY_OVERNIGHT',
+  'Express'
+];
+
 router.post('/', async (req, res) => {
   const {
     to_name, to_street1, to_city, to_state,
@@ -68,7 +79,7 @@ router.post('/', async (req, res) => {
 
     const shipment = response.data;
     const rates = (shipment.rates || [])
-      .filter(r => r && r.rate)
+      .filter(r => r && r.rate && ALLOWED_SERVICES.includes(r.service))
       .sort((a, b) => parseFloat(a.rate) - parseFloat(b.rate));
 
     res.json({
