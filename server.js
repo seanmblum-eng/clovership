@@ -19,7 +19,7 @@ app.use('/webhooks', require('./routes/webhooks'));
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'CloverShip is running' });
+  res.json({ status: 'Handy Ship is running' });
 });
 
 // Checkout page route
@@ -29,7 +29,7 @@ app.get('/checkout', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`CloverShip running on port ${PORT}`);
+  console.log(`Handy Ship running on port ${PORT}`);
 });
 
 module.exports = app;
