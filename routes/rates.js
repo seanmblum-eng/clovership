@@ -2,6 +2,26 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
+const carrierName = (c) => ({
+  'UPSDAP': 'UPS', 'UPS': 'UPS', 'USPS': 'USPS',
+  'FedExDefault': 'FedEx', 'FedEx': 'FedEx', 'FEDEX': 'FedEx',
+  'DHLExpress': 'DHL', 'Stamps': 'USPS'
+}[c] || c);
+
+const serviceName = (s) => s
+  .replace('GroundsaverGreaterThan1lb', 'Ground Saver')
+  .replace('GroundAdvantage', 'Ground Advantage')
+  .replace('SMART_POST', 'SmartPost')
+  .replace('FEDEX_GROUND', 'Ground')
+  .replace('FEDEX_EXPRESS_SAVER', 'Express Saver')
+  .replace('FEDEX_2_DAY', '2 Day')
+  .replace('STANDARD_OVERNIGHT', 'Standard Overnight')
+  .replace('PRIORITY_OVERNIGHT', 'Priority Overnight')
+  .replace('2ndDayAir', '2nd Day Air')
+  .replace('NextDayAir', 'Next Day Air')
+  .replace('3DaySelect', '3 Day Select')
+  .replace(/_/g, ' ');
+
 router.post('/', async (req, res) => {
   const {
     to_name, to_street1, to_city, to_state,
@@ -46,9 +66,6 @@ router.post('/', async (req, res) => {
     );
 
     const shipment = response.data;
-    console.log('Shipment id:', shipment.id);
-    console.log('Rates count:', (shipment.rates || []).length);
-
     const rates = (shipment.rates || [])
       .filter(r => r && r.rate)
       .sort((a, b) => parseFloat(a.rate) - parseFloat(b.rate));
@@ -57,8 +74,8 @@ router.post('/', async (req, res) => {
       shipment_id: shipment.id,
       rates: rates.map(r => ({
         id: r.id,
-        carrier: r.carrier,
-        service: r.service,
+        carrier: carrierName(r.carrier),
+        service: serviceName(r.service),
         rate: r.rate,
         retail_rate: r.retail_rate,
         delivery_days: r.delivery_days,
