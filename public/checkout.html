@@ -29,4 +29,167 @@
     .rate-option:last-child { border-bottom: none; }
     .rate-option:hover { background: #F8F8F8; }
     .rate-option.selected { background: #F0FAF5; }
-    .rate-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #D0D0D0; margin-right: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: ce
+    .rate-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #D0D0D0; margin-right: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .rate-option.selected .rate-radio { border-color: #1A8C4E; background: #1A8C4E; }
+    .rate-option.selected .rate-radio::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; display: block; }
+    .carrier-tag { font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px; margin-right: 10px; letter-spacing: 0.05em; flex-shrink: 0; }
+    .ups-tag { background: #351C15; color: #F5A623; }
+    .usps-tag { background: #004B87; color: white; }
+    .fedex-tag { background: #4D148C; color: #FF6600; }
+    .rate-info { flex: 1; }
+    .rate-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+    .rate-days { font-size: 13px; color: #888; margin-top: 2px; }
+    .rate-price { font-size: 17px; font-weight: 700; color: #1a1a1a; }
+    .rate-save { font-size: 11px; color: #1A8C4E; font-weight: 600; margin-top: 2px; text-align: right; }
+    .loading-rates { padding: 24px 20px; text-align: center; color: #888; font-size: 14px; }
+    .spinner { width: 24px; height: 24px; border: 2px solid #E0E0E0; border-top-color: #1A8C4E; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .summary-row { display: flex; justify-content: space-between; padding: 10px 20px; font-size: 15px; border-bottom: 1px solid #F0F0F0; }
+    .summary-row:last-child { border-bottom: none; font-weight: 700; font-size: 17px; }
+    .summary-label { color: #666; }
+    .btn-checkout { width: 100%; padding: 16px; background: #1A8C4E; color: white; border: none; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background 0.15s; }
+    .btn-checkout:hover { background: #0F5C33; }
+    .btn-checkout:disabled { background: #B0B0B0; cursor: default; }
+    .get-rates-btn { width: 100%; padding: 13px; background: #1A8C4E; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: background 0.15s; }
+    .get-rates-btn:hover { background: #0F5C33; }
+    .secure-note { text-align: center; font-size: 12px; color: #999; margin-top: 12px; padding-bottom: 32px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">📦</div>
+  <div>
+    <div class="header-text">Complete your shipping</div>
+    <div class="header-sub" id="merchant-name">Loading your order...</div>
+  </div>
+</div>
+<div class="container">
+  <div class="card">
+    <div class="card-header">Your order</div>
+    <div id="order-items">
+      <div class="order-item"><div><div class="item-name">Loading...</div></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">Shipping address</div>
+    <div class="form-group">
+      <label>Full name</label>
+      <input type="text" id="name" placeholder="Your name" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label>Street address</label>
+      <input type="text" id="street" placeholder="123 Main St" autocomplete="street-address">
+    </div>
+    <div class="form-group">
+      <label>Apartment / Suite (optional)</label>
+      <input type="text" id="street2" placeholder="Apt 2B">
+    </div>
+    <div class="form-group">
+      <div class="form-row">
+        <div>
+          <label>City</label>
+          <input type="text" id="city" placeholder="Chicago" autocomplete="address-level2">
+        </div>
+        <div>
+          <label>State</label>
+          <select id="state" autocomplete="address-level1">
+            <option value="">Select</option>
+            <option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option><option>CO</option><option>CT</option><option>DE</option><option>FL</option><option>GA</option><option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option><option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option><option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option><option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option><option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option><option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option><option>SD</option><option>TN</option><option>TX</option><option>UT</option><option>VT</option><option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>ZIP code</label>
+      <input type="text" id="zip" placeholder="60601" maxlength="5" inputmode="numeric" autocomplete="postal-code">
+    </div>
+    <div class="form-group">
+      <button class="get-rates-btn" onclick="getRates()">Get shipping rates →</button>
+    </div>
+  </div>
+  <div class="card hidden" id="rates-card">
+    <div class="card-header">Choose a shipping rate</div>
+    <div id="rates-container">
+      <div class="loading-rates"><div class="spinner"></div>Getting live rates...</div>
+    </div>
+  </div>
+  <div class="card hidden" id="total-card">
+    <div class="card-header">Order total</div>
+    <div class="summary-row"><span class="summary-label">Items</span><span id="items-total">$0.00</span></div>
+    <div class="summary-row"><span class="summary-label">Shipping</span><span id="shipping-total">$0.00</span></div>
+    <div class="summary-row"><span class="summary-label">Total</span><span id="grand-total">$0.00</span></div>
+  </div>
+  <button class="btn-checkout hidden" id="checkout-btn" onclick="completeCheckout()">Complete order →</button>
+  <div class="secure-note">🔒 Secure checkout · Powered by Handy Ship</div>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get('order_id') || 'TEST001';
+  const merchantId = params.get('merchant_id') || 'TEST';
+  const orderTotal = parseFloat(params.get('total') || '45.00');
+  document.getElementById('merchant-name').textContent = params.get('merchant') || 'Your order';
+  document.getElementById('items-total').textContent = '$' + orderTotal.toFixed(2);
+  document.getElementById('order-items').innerHTML = '<div class="order-item"><div><div class="item-name">' + (params.get('items') || 'Your items') + '</div><div class="item-qty">Order #' + orderId + '</div></div><div class="item-price">$' + orderTotal.toFixed(2) + '</div></div>';
+  let selectedRate = null;
+  async function getRates() {
+    const name = document.getElementById('name').value;
+    const street = document.getElementById('street').value;
+    const city = document.getElementById('city').value;
+    const state = document.getElementById('state').value;
+    const zip = document.getElementById('zip').value;
+    if (!name || !street || !city || !state || !zip) { alert('Please fill in your complete shipping address.'); return; }
+    const ratesCard = document.getElementById('rates-card');
+    ratesCard.classList.remove('hidden');
+    document.getElementById('rates-container').innerHTML = '<div class="loading-rates"><div class="spinner"></div>Getting live rates...</div>';
+    try {
+      const res = await fetch('/api/rates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to_name: name, to_street1: street, to_city: city, to_state: state, to_zip: zip, to_country: 'US', weight_oz: parseFloat(params.get('weight_oz') || '16'), length: parseFloat(params.get('length') || '10'), width: parseFloat(params.get('width') || '8'), height: parseFloat(params.get('height') || '6') }) });
+      const data = await res.json();
+      renderRates(data.rates, data.shipment_id);
+    } catch (err) {
+      document.getElementById('rates-container').innerHTML = '<div class="loading-rates">Could not load rates. Please try again.</div>';
+    }
+  }
+  function renderRates(rates, shipmentId) {
+    if (!rates || rates.length === 0) { document.getElementById('rates-container').innerHTML = '<div class="loading-rates">No rates available for this address.</div>'; return; }
+    const tagClass = { 'UPS': 'ups-tag', 'USPS': 'usps-tag', 'FedEx': 'fedex-tag' };
+    let html = '';
+    rates.forEach((rate, i) => {
+      const retail = rate.retail_rate ? parseFloat(rate.retail_rate) : parseFloat(rate.rate) * 1.6;
+      const save = (retail - parseFloat(rate.rate)).toFixed(2);
+      const tag = tagClass[rate.carrier] || 'ups-tag';
+      html += '<div class="rate-option' + (i === 0 ? ' selected' : '') + '" onclick="selectRate(this,\'' + rate.id + '\',\'' + shipmentId + '\',' + rate.rate + ')"><div class="rate-radio"></div><span class="carrier-tag ' + tag + '">' + rate.carrier + '</span><div class="rate-info"><div class="rate-name">' + rate.service + '</div><div class="rate-days">' + (rate.delivery_days ? rate.delivery_days + ' business days' : 'Estimated delivery varies') + '</div></div><div style="text-align:right"><div class="rate-price">$' + parseFloat(rate.rate).toFixed(2) + '</div><div class="rate-save">save $' + save + '</div></div></div>';
+    });
+    document.getElementById('rates-container').innerHTML = html;
+    if (rates.length > 0) selectRate(document.querySelector('.rate-option'), rates[0].id, shipmentId, rates[0].rate);
+  }
+  function selectRate(el, rateId, shipmentId, price) {
+    document.querySelectorAll('.rate-option').forEach(r => r.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedRate = { rateId, shipmentId, price: parseFloat(price) };
+    const grand = orderTotal + selectedRate.price;
+    document.getElementById('shipping-total').textContent = '$' + selectedRate.price.toFixed(2);
+    document.getElementById('grand-total').textContent = '$' + grand.toFixed(2);
+    document.getElementById('total-card').classList.remove('hidden');
+    document.getElementById('checkout-btn').classList.remove('hidden');
+  }
+  async function completeCheckout() {
+    if (!selectedRate) return;
+    const btn = document.getElementById('checkout-btn');
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+    try {
+      const res = await fetch('/api/labels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shipment_id: selectedRate.shipmentId, rate_id: selectedRate.rateId, order_id: orderId, merchant_id: merchantId, access_token: params.get('token') }) });
+      const data = await res.json();
+      if (data.success) {
+        document.querySelector('.container').innerHTML = '<div style="text-align:center;padding:60px 20px"><div style="font-size:56px;margin-bottom:16px">📦</div><h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Order confirmed!</h2><p style="color:#666;font-size:15px;margin-bottom:24px">Your tracking number is:</p><div style="background:#F0FAF5;border-radius:10px;padding:16px;font-size:18px;font-weight:700;color:#1A8C4E;letter-spacing:0.08em;margin-bottom:24px">' + data.tracking_number + '</div><p style="color:#888;font-size:13px">' + data.carrier + ' · We will email you updates</p></div>';
+      } else { throw new Error('Label purchase failed'); }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Complete order →';
+      alert('Something went wrong. Please try again.');
+    }
+  }
+</script>
+</body>
+</html>
